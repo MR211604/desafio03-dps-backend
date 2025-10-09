@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 
+import resourceRoutes from "./routes/resourceRoutes";
+import userRoutes from "./routes/userRoutes";
+
 const app = express();
 app.use(express.json());
 app.use(
@@ -10,15 +13,17 @@ app.use(
     credentials: true,
   })
 );
+app.use("/api/auth", userRoutes);
+app.use("/api/resources", resourceRoutes);
 // app.use(passport.initialize());
 // app.use(passport.session())
 
-async function main() {
+function main() {
   try {
     app.listen(8080);
     console.log("Server running on port 8080");
   } catch (error) {
-    console.log("An unkown error has occured", error);
+    console.log("An unknown error has occurred", error);
   }
 }
 
