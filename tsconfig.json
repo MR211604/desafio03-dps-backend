@@ -3,7 +3,7 @@
     "module": "ESNext",
     "esModuleInterop": true,
     "target": "ESNext",
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "moduleResolution": "Node",
     "outDir": "dist",
     "forceConsistentCasingInFileNames": true,
