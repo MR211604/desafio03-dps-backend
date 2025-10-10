@@ -3,12 +3,73 @@ import { prisma } from "../database/connection";
 
 async function getResources(req: Request, res: Response) {
   try {
-    const resource = await prisma.learningResource.findMany();
+    const {
+      search,
+      type,
+      orderBy = "createdAt",
+      order = "desc",
+      limit = "10",
+      page = "1",
+    } = req.query;
+
+    // Construir objeto where para filtros
+    const where: any = {};
+
+    // Búsqueda por título o descripción
+    if (search && typeof search === "string") {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // Filtro por tipo
+    if (type && typeof type === "string") {
+      const validTypes = ["VIDEO", "ARTICLE", "BOOK", "COURSE"];
+      if (validTypes.includes(type.toUpperCase())) {
+        where.type = type.toUpperCase();
+      }
+    }
+
+    // Configurar ordenamiento
+    const validOrderByFields = ["title", "createdAt", "updatedAt", "type"];
+    const orderByField = validOrderByFields.includes(orderBy as string)
+      ? (orderBy as string)
+      : "createdAt";
+
+    const orderDirection = order === "asc" ? "asc" : "desc";
+
+    // Configurar paginación
+    const pageNumber = +(page as string);
+    const limitNumber = +(limit as string);
+    const offset = (pageNumber - 1) * limitNumber;
+
+    // Obtener recursos con filtros, ordenamiento y paginación
+    const [resources, total] = await Promise.all([
+      prisma.learningResource.findMany({
+        where,
+        orderBy: {
+          [orderByField]: orderDirection,
+        },
+        take: limitNumber,
+        skip: offset,
+      }),
+      prisma.learningResource.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limitNumber);
 
     res.status(200).json({
       ok: true,
       message: "Recursos obtenidos con éxito",
-      data: resource,
+      data: resources,
+      pagination: {
+        total,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages,
+        count: resources.length,
+      },
     });
   } catch (error) {
     throw new Error("Ha ocurrido un error desconocido" + error);
@@ -41,12 +102,6 @@ async function getResource(req: Request, res: Response) {
   }
 }
 
-// id          Int          @id @default(autoincrement())
-// title       String
-// description String
-// url         String       @unique
-// type        ResourceType
-// image       String?
 async function createResource(req: Request, res: Response) {
   try {
     const { title, description, url, type, image } = req.body;
