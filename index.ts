@@ -8,7 +8,10 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost", //Ruta de donde tendra acceso este servidor
+    origin: [
+      "http://localhost",
+      /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/,
+    ], //Ruta de donde tendra acceso este servidor
     methods: "GET,POST",
     credentials: true,
   })
