@@ -7,6 +7,7 @@ import {
   createResource,
   getResource,
   updateResource,
+  deleteResource,
 } from "../controllers/resourcesController";
 import { schemaValidator } from "../middlewares/schemaValidator";
 import { resourceSchema } from "../schemas/resourceSchema";
@@ -19,5 +20,5 @@ router.put(
   schemaValidator(resourceSchema),
   updateResource
 );
-router.delete("/deleteResource/:id", updateResource);
+router.delete("/deleteResource/:id", deleteResource);
 export default router;
