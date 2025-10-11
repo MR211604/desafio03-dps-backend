@@ -10,9 +10,10 @@ app.use(
   cors({
     origin: [
       "http://localhost",
-      /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/,
-    ], //Ruta de donde tendra acceso este servidor
-    methods: "GET,POST",
+      /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/, // Permitir cualquier IP en la red local 192.168.x.x
+      /^http:\/\/10\.0\.\d{1,3}\.\d{1,3}(:\d+)?$/, // Permitir cualquier IP en la red local 10.0.x.x
+    ],
+    methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
 );
