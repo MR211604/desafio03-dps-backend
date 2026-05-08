@@ -21,22 +21,59 @@ enum ResourceType {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
-  username        String
-  email           String
-  hashed_password String
-  photoUrl        String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime? @updatedAt
+  id                    Int             @id @default(autoincrement())
+  username              String
+  email                 String
+  hashed_password       String
+  photoUrl              String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime?       @updatedAt
+  userFavoriteResources UserFavorites[]
+  userRatings           UserRating[]
+  userRol               UserRol         @relation(fields: [userRolId], references: [id])
+  userRolId             Int
+}
+
+model UserRol {
+  id        Int      @id @default(autoincrement())
+  rol       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
 }
 
 model LearningResource {
-  id          Int          @id @default(autoincrement())
-  title       String
-  description String
-  url         String       @unique
-  type        ResourceType
-  image       String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime?    @updatedAt
+  id                    Int             @id @default(autoincrement())
+  title                 String
+  description           String
+  url                   String          @unique
+  type                  ResourceType
+  image                 String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime?       @updatedAt
+  userFavoriteResources UserFavorites[]
+  userRatings           UserRating[]
+}
+
+model UserFavorites {
+  id         Int              @id @default(autoincrement())
+  user       User             @relation(fields: [userId], references: [id])
+  userId     Int
+  resource   LearningResource @relation(fields: [resourceId], references: [id])
+  resourceId Int
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime?        @updatedAt
+}
+
+model UserRating {
+  id         Int              @id @default(autoincrement())
+  user       User             @relation(fields: [userId], references: [id])
+  userId     Int
+  resource   LearningResource @relation(fields: [resourceId], references: [id])
+  resourceId Int
+  rating     Int              @default(1)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime?        @updatedAt
+
+  @@unique([userId, resourceId])
 }
