@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
 import { Payload } from "../types/jwt";
 
-export const generateJWT = (id: string) => {
+export const generateJWT = (id: string, rol: string) => {
   return new Promise((resolve, reject) => {
-    const payload = { id };
-    console.log("payload", payload);
+    const payload = { id, rol };
     jwt.sign(
       payload,
       process.env.JWT_KEY as string,
@@ -25,10 +24,11 @@ export const generateJWT = (id: string) => {
 
 export const verifyJWT = (token: string | "") => {
   try {
-    const { id } = <Payload>jwt.verify(token, process.env.JWT_KEY as string);
+    const { id, rol } = <Payload>jwt.verify(token, process.env.JWT_KEY as string);
     return {
       success: true,
       id: id,
+      rol: rol,
     };
   } catch (error) {
     return { success: false, error };

@@ -29,6 +29,7 @@ export const registerSchema = z.object({
       error:
         "La contraseña debe contener al menos un carácter especial (!@#$%^&*).",
     }),
+  userRol: z.number({ error: "El id del rol es obligatorio" }),
 });
 
 export const loginSchema = z.object({
