@@ -83,6 +83,9 @@ async function getResource(req: Request, res: Response) {
       where: {
         id: Number(id),
       },
+      include: {
+        userRatings: true,
+      },
     });
 
     if (!resource) {
@@ -263,8 +266,8 @@ async function removeFavoriteResource(req: Request, res: Response) {
 
   const foundUserFavorite = await prisma.userFavorites.findFirst({
     where: {
-      userId,
-      resourceId,
+      userId: +userId,
+      resourceId: +resourceId,
     },
   });
 
@@ -277,7 +280,7 @@ async function removeFavoriteResource(req: Request, res: Response) {
 
   await prisma.userFavorites.delete({
     where: {
-      id: foundUserFavorite.id,
+      id: +foundUserFavorite.id,
     },
   });
 
@@ -311,8 +314,8 @@ async function rateResource(req: Request, res: Response) {
 
   const foundUserRating = await prisma.userRating.findFirst({
     where: {
-      userId,
-      resourceId,
+      userId: +userId,
+      resourceId: +resourceId,
     },
   });
 
@@ -320,16 +323,16 @@ async function rateResource(req: Request, res: Response) {
   if (foundUserRating) {
     await prisma.userRating.delete({
       where: {
-        id: foundUserRating.id,
+        id: +foundUserRating.id,
       },
     });
   }
 
   const newRating = await prisma.userRating.create({
     data: {
-      userId,
-      resourceId,
-      rating,
+      userId: +userId,
+      resourceId: +resourceId,
+      rating: +rating,
     },
   });
 
@@ -349,5 +352,5 @@ export {
   addFavoriteResource,
   removeFavoriteResource,
   getFavoritesResourcesByUser,
-  rateResource
+  rateResource,
 };
