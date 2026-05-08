@@ -53,6 +53,9 @@ async function getResources(req: Request, res: Response) {
         },
         take: limitNumber,
         skip: offset,
+        include: {
+          userRatings: true,
+        },
       }),
       prisma.learningResource.count({ where }),
     ]);
