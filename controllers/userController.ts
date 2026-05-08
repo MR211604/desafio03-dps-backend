@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 
 const registerUser = async (req: Request, res: Response) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, userRol } = req.body;
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -27,6 +27,7 @@ const registerUser = async (req: Request, res: Response) => {
         username,
         email,
         hashed_password: hashedPassword,
+        userRolId: userRol,
       },
     });
 
@@ -56,6 +57,9 @@ const loginUser = async (req: Request, res: Response) => {
       where: {
         email,
       },
+      include: {
+        userRol: true,
+      },
     });
 
     if (!foundUser) {
@@ -67,7 +71,7 @@ const loginUser = async (req: Request, res: Response) => {
 
     const isPasswordValid = bcrypt.compareSync(
       password,
-      foundUser.hashed_password
+      foundUser.hashed_password,
     );
 
     if (!isPasswordValid) {
@@ -77,7 +81,10 @@ const loginUser = async (req: Request, res: Response) => {
       });
     }
 
-    const token = await generateJWT(foundUser.id.toString());
+    const token = await generateJWT(
+      foundUser.id.toString(),
+      foundUser.userRol.rol,
+    );
     return res.status(200).json({
       ok: true,
       message: "Inicio de sesión exitoso",
@@ -97,8 +104,18 @@ const authRenewToken = async (req: Request, res: Response) => {
     where: {
       id,
     },
+    include: {
+      userRol: true,
+    },
   });
-  const token = await generateJWT(id);
+
+  if (!foundUser) {
+    return res
+      .status(404)
+      .json({ ok: false, message: "Usuario no encontrado" });
+  }
+
+  const token = await generateJWT(id, foundUser.userRol.rol);
   return res.status(200).json({
     ok: true,
     message: "Renew",

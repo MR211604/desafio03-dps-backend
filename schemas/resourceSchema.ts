@@ -7,9 +7,9 @@ export const resourceSchema = z.object({
   description: z
     .string({ error: "La descripción es obligatoria" })
     .min(1, { error: "La descripción debe tener al menos 1 carácter" }),
-  url: z.string({ error: "La URL es obligatoria" }),
+  url: z.url({ error: "La URL del recurso es inválida" }),
   type: z.enum(["VIDEO", "ARTICLE", "BOOK", "COURSE"], {
     error: "Tipo de recurso inválido, debe ser: VIDEO, ARTICLE, BOOK o COURSE",
   }),
-  image: z.string().optional(),
+  image: z.url({ error: "La URL de la imagen es inválida" }).optional(),
 });

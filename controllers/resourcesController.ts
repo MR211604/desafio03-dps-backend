@@ -227,10 +227,127 @@ async function deleteResource(req: Request, res: Response) {
   }
 }
 
+async function addFavoriteResource(req: Request, res: Response) {
+  const { userId, resourceId } = req.body;
+
+  const foundUserFavorite = await prisma.userFavorites.findFirst({
+    where: {
+      userId,
+      resourceId,
+    },
+  });
+
+  if (foundUserFavorite) {
+    return res.status(400).json({
+      ok: false,
+      message: "El usuario ya tiene este recurso como favorito",
+    });
+  }
+
+  const newFavorite = await prisma.userFavorites.create({
+    data: {
+      userId,
+      resourceId,
+    },
+  });
+
+  res.status(201).json({
+    ok: true,
+    message: "Recurso agregado a favoritos con éxito",
+    data: newFavorite,
+  });
+}
+
+async function removeFavoriteResource(req: Request, res: Response) {
+  const { userId, resourceId } = req.body;
+
+  const foundUserFavorite = await prisma.userFavorites.findFirst({
+    where: {
+      userId,
+      resourceId,
+    },
+  });
+
+  if (!foundUserFavorite) {
+    return res.status(404).json({
+      ok: false,
+      message: "No se encontró el recurso favorito",
+    });
+  }
+
+  await prisma.userFavorites.delete({
+    where: {
+      id: foundUserFavorite.id,
+    },
+  });
+
+  res.status(200).json({
+    ok: true,
+    message: "Recurso eliminado de favoritos con éxito",
+  });
+}
+
+async function getFavoritesResourcesByUser(req: Request, res: Response) {
+  const { userId } = req.params;
+
+  const foundUserFavorites = await prisma.userFavorites.findMany({
+    where: {
+      userId: +userId,
+    },
+    include: {
+      resource: true,
+    },
+  });
+
+  res.status(200).json({
+    ok: true,
+    message: "Recursos favoritos obtenidos con éxito",
+    data: foundUserFavorites,
+  });
+}
+
+async function rateResource(req: Request, res: Response) {
+  const { userId, resourceId, rating } = req.body;
+
+  const foundUserRating = await prisma.userRating.findFirst({
+    where: {
+      userId,
+      resourceId,
+    },
+  });
+
+  //Delete previous rating if exists
+  if (foundUserRating) {
+    await prisma.userRating.delete({
+      where: {
+        id: foundUserRating.id,
+      },
+    });
+  }
+
+  const newRating = await prisma.userRating.create({
+    data: {
+      userId,
+      resourceId,
+      rating,
+    },
+  });
+
+  res.status(201).json({
+    ok: true,
+    message: "Recurso calificado con éxito",
+    data: newRating,
+  });
+}
+
 export {
   getResources,
   getResource,
   createResource,
   updateResource,
   deleteResource,
+  addFavoriteResource,
+  removeFavoriteResource,
+  getFavoritesResourcesByUser,
+  rateResource
 };
