@@ -2,6 +2,19 @@ import { Request, Response, NextFunction } from "express";
 import * as jwt from "jsonwebtoken";
 import { Payload } from "../types/jwt";
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        rol: string;
+        email?: string;
+        username?: string;
+      };
+    }
+  }
+}
+
 /**
  * Middleware that verifies the JWT token from the "x-token" header.
  * On success it attaches `userId` and `userRol` to `req.body`
@@ -23,13 +36,13 @@ export const authenticate = (
     }
 
     const decoded = <Payload>jwt.verify(token, process.env.JWT_KEY as string);
-    console.log("req.body", req.body);
-    console.log("Decoded token payload:", decoded);
 
-    req.body.userId = decoded.id;
-    req.body.userRol = decoded.rol;
-    req.body.userEmail = decoded.email;
-    req.body.username = decoded.username;
+    req.user = {
+      id: decoded.id,
+      rol: decoded.rol,
+      email: decoded.email,
+      username: decoded.username,
+    };
 
     next();
   } catch (error: unknown) {
@@ -53,7 +66,7 @@ export const authenticate = (
  */
 export const authorize = (...allowedRoles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const userRol: string | undefined = req.body.userRol;
+    const userRol: string | undefined = req.user?.rol;
 
     if (!userRol) {
       return res.status(401).json({

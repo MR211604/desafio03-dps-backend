@@ -11,12 +11,10 @@ app.use(
     origin: "*", // temporal
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
-  })
+  }),
 );
 app.use("/api/auth", userRoutes);
 app.use("/api/resources", resourceRoutes);
-// app.use(passport.initialize());
-// app.use(passport.session())
 
 function main() {
   try {
