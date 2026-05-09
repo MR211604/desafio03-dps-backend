@@ -238,8 +238,8 @@ async function addFavoriteResource(req: Request, res: Response) {
 
   const foundUserFavorite = await prisma.userFavorites.findFirst({
     where: {
-      userId,
-      resourceId,
+      userId: +userId,
+      resourceId: +resourceId,
     },
   });
 
@@ -252,8 +252,8 @@ async function addFavoriteResource(req: Request, res: Response) {
 
   const newFavorite = await prisma.userFavorites.create({
     data: {
-      userId,
-      resourceId,
+      userId: +userId,
+      resourceId: +resourceId,
     },
   });
 
