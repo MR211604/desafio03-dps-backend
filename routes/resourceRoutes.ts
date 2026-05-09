@@ -8,7 +8,7 @@ import {
   getResource,
   updateResource,
   deleteResource,
-  addFavoriteResource,
+  toggleFavoriteResource,
   removeFavoriteResource,
   getFavoritesResourcesByUser,
   rateResource,
@@ -23,8 +23,7 @@ router.get("/getResource/:id", getResource);
 router.get("/getFavoritesResourcesByUser/:userId", getFavoritesResourcesByUser);
 
 // Authenticated user routes
-router.post("/addFavoriteResource", authenticate, addFavoriteResource);
-router.delete("/removeFavoriteResource", authenticate, removeFavoriteResource);
+router.post("/toggleFavoriteResource", authenticate, toggleFavoriteResource);
 router.post("/rateResource", authenticate, rateResource);
 
 // Admin routes

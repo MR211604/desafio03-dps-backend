@@ -233,7 +233,7 @@ async function deleteResource(req: Request, res: Response) {
   }
 }
 
-async function addFavoriteResource(req: Request, res: Response) {
+async function toggleFavoriteResource(req: Request, res: Response) {
   const { userId, resourceId } = req.body;
 
   const foundUserFavorite = await prisma.userFavorites.findFirst({
@@ -244,9 +244,16 @@ async function addFavoriteResource(req: Request, res: Response) {
   });
 
   if (foundUserFavorite) {
-    return res.status(400).json({
+    // remove favorite if already exists
+    await prisma.userFavorites.delete({
+      where: {
+        id: +foundUserFavorite.id,
+      },
+    });
+
+    return res.status(200).json({
       ok: false,
-      message: "El usuario ya tiene este recurso como favorito",
+      message: "Recurso removido de favoritos con éxito",
     });
   }
 
@@ -322,7 +329,6 @@ async function rateResource(req: Request, res: Response) {
     },
   });
 
-  //Delete previous rating if exists
   if (foundUserRating) {
     await prisma.userRating.delete({
       where: {
@@ -352,7 +358,7 @@ export {
   createResource,
   updateResource,
   deleteResource,
-  addFavoriteResource,
+  toggleFavoriteResource,
   removeFavoriteResource,
   getFavoritesResourcesByUser,
   rateResource,
