@@ -23,6 +23,8 @@ export const authenticate = (
     }
 
     const decoded = <Payload>jwt.verify(token, process.env.JWT_KEY as string);
+    console.log("req.body", req.body);
+    console.log("Decoded token payload:", decoded);
 
     req.body.userId = decoded.id;
     req.body.userRol = decoded.rol;
@@ -31,6 +33,7 @@ export const authenticate = (
 
     next();
   } catch (error: unknown) {
+    console.log("Error en autenticación", error);
     return res.status(401).json({
       ok: false,
       message: "Token inválido o expirado",
