@@ -81,10 +81,12 @@ const loginUser = async (req: Request, res: Response) => {
       });
     }
 
-    const token = await generateJWT(
-      foundUser.id.toString(),
-      foundUser.userRol.rol,
-    );
+    const token = await generateJWT({
+      id: foundUser.id.toString(),
+      rol: foundUser.userRol.rol,
+      username: foundUser.username,
+      email: foundUser.email,
+    });
     return res.status(200).json({
       ok: true,
       message: "Inicio de sesión exitoso",
@@ -115,7 +117,12 @@ const authRenewToken = async (req: Request, res: Response) => {
       .json({ ok: false, message: "Usuario no encontrado" });
   }
 
-  const token = await generateJWT(id, foundUser.userRol.rol);
+  const token = await generateJWT({
+    id: foundUser.id.toString(),
+    rol: foundUser.userRol.rol,
+    username: foundUser.username,
+    email: foundUser.email,
+  });
   return res.status(200).json({
     ok: true,
     message: "Renew",

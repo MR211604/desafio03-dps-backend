@@ -10,7 +10,7 @@ import { Payload } from "../types/jwt";
 export const authenticate = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const token = req.header("x-token");
@@ -22,12 +22,12 @@ export const authenticate = (
       });
     }
 
-    const decoded = <Payload>(
-      jwt.verify(token, process.env.JWT_KEY as string)
-    );
+    const decoded = <Payload>jwt.verify(token, process.env.JWT_KEY as string);
 
     req.body.userId = decoded.id;
     req.body.userRol = decoded.rol;
+    req.body.userEmail = decoded.email;
+    req.body.username = decoded.username;
 
     next();
   } catch (error: unknown) {
@@ -61,7 +61,7 @@ export const authorize = (...allowedRoles: string[]) => {
 
     // Case-insensitive comparison to be resilient to DB casing
     const hasRole = allowedRoles.some(
-      (role) => role.toLowerCase() === userRol.toLowerCase()
+      (role) => role.toLowerCase() === userRol.toLowerCase(),
     );
 
     if (!hasRole) {
